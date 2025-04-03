@@ -17,32 +17,74 @@
         .buttons {
             margin-bottom: 10px;
         }
+        #login {
+            display: block;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #dashboard {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Third Form - Inventory, Substances & Users</h1>
-    <div class="buttons">
-        <button onclick="filterData('all')">Show All</button>
-        <button onclick="filterData('inventory')">Inventory</button>
-        <button onclick="filterData('substances')">Substances</button>
-        <button onclick="filterData('users')">Users</button>
+    <div id="login">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="error" style="color: red;"></p>
     </div>
-    <table id="data-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Quantity</th>
-                <th>Comments</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be inserted here -->
-        </tbody>
-    </table>
+
+    <div id="dashboard">
+        <h1>Third Form - Inventory, Substances & Users</h1>
+        <div class="buttons">
+            <button onclick="filterData('all')">Show All</button>
+            <button onclick="filterData('inventory')">Inventory</button>
+            <button onclick="filterData('substances')">Substances</button>
+            <button onclick="filterData('users')">Users</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
 
     <script>
+        const users = [
+            { "id": "1", "vards": "Janis", "uzvards": "Kociņš", "loma": "admin", "parole": "12", "Komentāri": "Daži komentāri" }
+        ];
+
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const user = users.find(u => u.vards === username && u.parole === password);
+
+            if (user) {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                filterData('all');
+            } else {
+                document.getElementById("error").textContent = "Invalid username or password";
+            }
+        }
+
+        function logout() {
+            document.getElementById("login").style.display = "block";
+            document.getElementById("dashboard").style.display = "none";
+        }
+
         const inventory = [
             { "id": 1, "nosaukums": "Mehāniskie svari QWS", "tips": "svari", "skaits": 5, "komentari": "" },
             { "id": 2, "nosaukums": "Elektroniskie svari ES-25", "tips": "svari", "skaits": 15, "komentari": "Darbojas uz 3 AAA tipa baterijām" }
@@ -53,16 +95,12 @@
             { "id": 3, "nosaukums": "NaOH šķīdums 10%", "tips": "reaģents", "skaits": 45, "mervienibas": "ml", "komentari": "Šķīdums izvedots un sapildīts 2020.09.23" }
         ];
 
-        const users = [
-            { "id": "1", "nosaukums": "Janis Kociņš", "tips": "admin", "skaits": "-", "komentari": "Daži komentāri" }
-        ];
-
         function filterData(type) {
             let data = [];
             if (type === 'inventory') data = inventory;
             else if (type === 'substances') data = substances;
-            else if (type === 'users') data = users;
-            else data = [...inventory, ...substances, ...users];
+            else if (type === 'users') data = users.map(u => ({ id: u.id, nosaukums: `${u.vards} ${u.uzvards}`, tips: u.loma, skaits: '-', komentari: u.Komentāri }));
+            else data = [...inventory, ...substances, ...users.map(u => ({ id: u.id, nosaukums: `${u.vards} ${u.uzvards}`, tips: u.loma, skaits: '-', komentari: u.Komentāri }))];
             
             renderTable(data);
         }
@@ -82,8 +120,6 @@
                 tbody.innerHTML += row;
             });
         }
-
-        filterData('all');
     </script>
 </body>
 </html>
