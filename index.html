@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory & Substances</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        .buttons {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Third Form - Inventory & Substances</h1>
+    <div class="buttons">
+        <button onclick="filterData('all')">Show All</button>
+        <button onclick="filterData('inventory')">Inventory</button>
+        <button onclick="filterData('substances')">Substances</button>
+    </div>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Quantity</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        let inventory = [];
+        let substances = [];
+
+        async function loadData() {
+            const inventoryResponse = await fetch('inventars.json');
+            inventory = await inventoryResponse.json();
+            
+            const substancesResponse = await fetch('vielas.json');
+            substances = await substancesResponse.json();
+            
+            filterData('all');
+        }
+
+        function filterData(type) {
+            let data = [];
+            if (type === 'inventory') data = inventory;
+            else if (type === 'substances') data = substances;
+            else data = [...inventory, ...substances];
+            
+            renderTable(data);
+        }
+
+        function renderTable(data) {
+            const tbody = document.querySelector('#data-table tbody');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = `<tr>
+                    <td>${item.id}</td>
+                    <td>${item.nosaukums}</td>
+                    <td>${item.tips}</td>
+                    <td>${item.skaits || item.daudzums} ${item.mervienibas || ''}</td>
+                    <td>${item.komentari}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
