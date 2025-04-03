@@ -20,11 +20,12 @@
     </style>
 </head>
 <body>
-    <h1>Third Form - Inventory & Substances</h1>
+    <h1>Third Form - Inventory, Substances & Users</h1>
     <div class="buttons">
         <button onclick="filterData('all')">Show All</button>
         <button onclick="filterData('inventory')">Inventory</button>
         <button onclick="filterData('substances')">Substances</button>
+        <button onclick="filterData('users')">Users</button>
     </div>
     <table id="data-table">
         <thead>
@@ -43,24 +44,25 @@
 
     <script>
         const inventory = [
-            { "apakstips": "mehāniskie svari", "id": 1, "komentari": "", "nosaukums": "Mehāniskie svari QWS", "skaits": 5, "tips": "svari" },
-            { "apakstips": "elektroniskie svari", "id": 2, "komentari": "Darbojas uz 3 AAA tipa baterijām", "nosaukums": "Elektroniskie svari ES-25", "skaits": 15, "tips": "svari" }
+            { "id": 1, "nosaukums": "Mehāniskie svari QWS", "tips": "svari", "skaits": 5, "komentari": "" },
+            { "id": 2, "nosaukums": "Elektroniskie svari ES-25", "tips": "svari", "skaits": 15, "komentari": "Darbojas uz 3 AAA tipa baterijām" }
         ];
 
         const substances = [
-            { "apakstips": "sāls", "daudzums": 100, "id": 2, "komentari": "", "mervienibas": "g", "nosaukums": "Kalcija karbonāts CaCO3", "skaits": 25, "tips": "reaģents" },
-            { "apakstips": "hidroksīds", "daudzums": 50, "id": 3, "komentari": "Šķīdums izvedots un sapildīts 2020.09.23", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 10%", "skaits": 45, "tips": "reaģents" }
+            { "id": 2, "nosaukums": "Kalcija karbonāts CaCO3", "tips": "reaģents", "skaits": 25, "mervienibas": "g", "komentari": "" },
+            { "id": 3, "nosaukums": "NaOH šķīdums 10%", "tips": "reaģents", "skaits": 45, "mervienibas": "ml", "komentari": "Šķīdums izvedots un sapildīts 2020.09.23" }
         ];
 
         const users = [
-            { "id": "1", "vards": "Janis", "uzvards": "Kociņš", "loma": "admin", "parole": "12", "Komentāri": "Daži komentāri" }
+            { "id": "1", "nosaukums": "Janis Kociņš", "tips": "admin", "skaits": "-", "komentari": "Daži komentāri" }
         ];
 
         function filterData(type) {
             let data = [];
             if (type === 'inventory') data = inventory;
             else if (type === 'substances') data = substances;
-            else data = [...inventory, ...substances];
+            else if (type === 'users') data = users;
+            else data = [...inventory, ...substances, ...users];
             
             renderTable(data);
         }
@@ -74,7 +76,7 @@
                     <td>${item.id}</td>
                     <td>${item.nosaukums}</td>
                     <td>${item.tips}</td>
-                    <td>${item.skaits || item.daudzums} ${item.mervienibas || ''}</td>
+                    <td>${item.skaits || '-'} ${item.mervienibas || ''}</td>
                     <td>${item.komentari}</td>
                 </tr>`;
                 tbody.innerHTML += row;
