@@ -5,75 +5,201 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory & Substances</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .buttons {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .buttons button {
+            background-color: #28a745; /* Green for filter buttons */
+        }
+        .buttons button:hover {
+            background-color: #218838;
+        }
+        #logoutButton {
+            background-color: #dc3545; /* Red for logout */
+        }
+        #logoutButton:hover {
+            background-color: #c82333;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
-            border: 1px solid black;
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
             text-align: left;
         }
-        .buttons {
-            margin-bottom: 10px;
+        th {
+            background-color: #f2f2f2;
+            color: #555;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #error {
+            color: red;
+            margin-top: 10px;
+            font-weight: bold;
         }
         #login {
             display: block;
-            text-align: center;
-            margin-top: 50px;
         }
         #dashboard {
             display: none;
         }
+        #publicDatabaseLink { /* Стиль для новой ссылки/кнопки */
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        #publicDatabaseLink button {
+            background-color: #6c757d; /* Цвет для публичной кнопки */
+        }
+        #publicDatabaseLink button:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
-    <div id="login">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p id="error" style="color: red;"></p>
-    </div>
-
-    <div id="dashboard">
-        <h1>Third Form - Inventory, Substances & Users</h1>
-        <div class="buttons">
-            <button onclick="filterData('all')">Show All</button>
-            <button onclick="filterData('inventory')">Inventory</button>
-            <button onclick="filterData('substances')">Substances</button>
-            <button onclick="filterData('users')">Users</button>
-            <button onclick="logout()">Logout</button>
+    <div class="container" id="login-container">
+        <div id="login">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <p id="error"></p>
+            <div id="publicDatabaseLink">
+                <button onclick="showPublicDashboard()">Public Database</button>
+            </div>
         </div>
-        <table id="data-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Quantity</th>
-                    <th>Comments</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be inserted here -->
-            </tbody>
-        </table>
+
+        <div id="dashboard">
+            <h1>Dashboard</h1>
+            <div class="buttons">
+                <button onclick="filterData('all')">Show All</button>
+                <button onclick="filterData('inventory')">Inventory</button>
+                <button onclick="filterData('substances')">Substances</button>
+                <button onclick="filterData('users')">Users</button>
+                <button id="logoutButton" onclick="logout()">Logout</button>
+            </div>
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Quantity / Amount</th> <th>Units</th> <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        const users = [
-            { "id": "1", "vards": "Janis", "uzvards": "Kociņš", "loma": "admin", "parole": "12", "Komentāri": "Daži komentāri" }
+        // Data from JSON files (assuming they are in the same directory)
+        // Note: For a real application, fetching these from separate files
+        // and using a backend for user authentication would be more secure.
+        // For GitHub Pages and this exercise, direct loading is acceptable.
+
+        // Loaded from users (1).json
+        const usersData = {
+            "users": [
+                { "id": "1", "vards": "Janis", "uzvards": "Kociņš", "loma": "admin", "parole": "12", "Komentāri": "Daži komentāri" }
+            ]
+        };
+        const users = usersData.users; // Extracting the array of users
+
+        // Loaded from inventars (1).json
+        const inventory = [
+            { "apakstips": "mehāniskie svari", "id": 1, "komentari": "", "nosaukums": "Mehāniskie svari QWS", "skaits": 5, "tips": "svari" },
+            { "apakstips": "elektroniskie svari", "id": 2, "komentari": "Darbojas uz 3 AAA tipa baterijām", "nosaukums": "Elektroniskie svari ES-25", "skaits": 15, "tips": "svari" },
+            { "apakstips": "plītiņa", "id": 3, "komentari": "Strāvas vada garums 1m", "nosaukums": "Elektriskā plītīņa", "skaits": 8, "tips": "sildītājs" },
+            { "apakstips": "trauki", "id": 4, "komentari": "Kolbas īpaši lielām vielām", "nosaukums": "Milzīgās kolbas", "skaits": 100, "tips": "trauks" },
+            { "apakstips": "stikls", "id": 5, "komentari": "Viegli plīstoša", "nosaukums": "Stikla mēģene", "skaits": 12, "tips": "trauks" }
+        ];
+
+        // Loaded from vielas (1).json
+        const substances = [
+            { "apakstips": "sāls", "daudzums": 100, "id": 2, "komentari": "", "mervienibas": "g", "nosaukums": "Kalcija karbonāts CaCO3", "skaits": 25, "tips": "reaģents" },
+            { "apakstips": "hidroksīds", "daudzums": 50, "id": 3, "komentari": "Šķīdums izvedots un sapildīts 2020.09.23", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 10%", "skaits": 45, "tips": "reaģents" },
+            { "apakstips": "skābe", "daudzums": 100, "id": 4, "komentari": "Šķīdums izvedots un sapildīts 2020.10.21", "mervienibas": "ml", "nosaukums": "Sālsskābes HCl šķīdums 20%", "skaits": 24, "tips": "reaģents" },
+            { "apakstips": "test1", "daudzums": 50, "id": 5, "komentari": "Šķīdums izvedots un sapildīts 2020.09.23", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 10%", "skaits": 45, "tips": "reaģents" },
+            { "apakstips": "hidroksīds", "daudzums": 100, "id": 6, "komentari": "Šķīdums izvedots un sapildīts 2020.10.21", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 20%", "skaits": 413, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 50, "id": 7, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "NaOH šķīdums 10%", "skaits": 45, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 8, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 9, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 10, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 11, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 12, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 13, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 14, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" },
+            { "apakstips": "test2", "daudzums": 5, "id": 15, "komentari": "Šķīdums izvedots un sapildīts lorem ipsum", "mervienibas": "ml", "nosaukums": "Nosaukums lorem ipsum", "skaits": 4, "tips": "reaģents" }
         ];
 
         function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
+            // Find user in the pre-loaded users array [cite: 1, 3]
             const user = users.find(u => u.vards === username && u.parole === password);
 
             if (user) {
                 document.getElementById("login").style.display = "none";
                 document.getElementById("dashboard").style.display = "block";
+                // Show all data by default after login
                 filterData('all');
             } else {
                 document.getElementById("error").textContent = "Invalid username or password";
@@ -83,41 +209,123 @@
         function logout() {
             document.getElementById("login").style.display = "block";
             document.getElementById("dashboard").style.display = "none";
+            document.getElementById("error").textContent = ""; // Clear error message
         }
 
-        const inventory = [
-            { "id": 1, "nosaukums": "Mehāniskie svari QWS", "tips": "svari", "skaits": 5, "komentari": "" },
-            { "id": 2, "nosaukums": "Elektroniskie svari ES-25", "tips": "svari", "skaits": 15, "komentari": "Darbojas uz 3 AAA tipa baterijām" }
-        ];
-
-        const substances = [
-            { "id": 2, "nosaukums": "Kalcija karbonāts CaCO3", "tips": "reaģents", "skaits": 25, "mervienibas": "g", "komentari": "" },
-            { "id": 3, "nosaukums": "NaOH šķīdums 10%", "tips": "reaģents", "skaits": 45, "mervienibas": "ml", "komentari": "Šķīdums izvedots un sapildīts 2020.09.23" }
-        ];
+        function showPublicDashboard() {
+            document.getElementById("login").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+            // Show all data for public view
+            filterData('all');
+            // Hide the "Users" button for public view, or adjust based on requirements
+            document.querySelector('.buttons button:nth-child(4)').style.display = 'none'; // Hide "Users" button
+            document.getElementById("logoutButton").style.display = 'none'; // Hide logout button for public view
+            document.getElementById("dashboard").querySelector('h1').textContent = "Public Database"; // Change title
+        }
 
         function filterData(type) {
             let data = [];
-            if (type === 'inventory') data = inventory;
-            else if (type === 'substances') data = substances;
-            else if (type === 'users') data = users.map(u => ({ id: u.id, nosaukums: `${u.vards} ${u.uzvards}`, tips: u.loma, skaits: '-', komentari: u.Komentāri }));
-            else data = [...inventory, ...substances, ...users.map(u => ({ id: u.id, nosaukums: `${u.vards} ${u.uzvards}`, tips: u.loma, skaits: '-', komentari: u.Komentāri }))];
-            
+            // Combine inventory and substances with a 'type' property for easier filtering
+            const allCombinedData = [
+                ...inventory.map(item => ({ ...item, category: 'inventory' })),
+                ...substances.map(item => ({ ...item, category: 'substance' }))
+            ];
+
+            if (type === 'inventory') {
+                data = allCombinedData.filter(item => item.category === 'inventory');
+            } else if (type === 'substances') {
+                data = allCombinedData.filter(item => item.category === 'substance');
+            } else if (type === 'users') {
+                // Map user data to fit the table structure
+                data = users.map(u => ({
+                    id: u.id,
+                    nosaukums: `${u.vards} ${u.uzvards}`,
+                    tips: u.loma,
+                    skaits: '-', // Not applicable for users
+                    mervienibas: '', // Not applicable for users
+                    komentari: u.Komentāri,
+                    category: 'user'
+                }));
+            } else { // 'all'
+                data = [
+                    ...allCombinedData,
+                    ...users.map(u => ({ // Include users in 'all' view
+                        id: u.id,
+                        nosaukums: `${u.vards} ${u.uzvards}`,
+                        tips: u.loma,
+                        skaits: '-',
+                        mervienibas: '',
+                        komentari: u.Komentāri,
+                        category: 'user'
+                    }))
+                ];
+            }
+
             renderTable(data);
         }
 
         function renderTable(data) {
             const tbody = document.querySelector('#data-table tbody');
-            tbody.innerHTML = '';
-            
+            tbody.innerHTML = ''; // Clear existing rows
+
+            // Adjust table header for 'users' view
+            const tableHeadings = document.querySelectorAll('#data-table th');
+            if (data.length > 0 && data[0].category === 'user') {
+                 // For users, show relevant columns
+                tableHeadings[0].textContent = 'ID';
+                tableHeadings[1].textContent = 'Name';
+                tableHeadings[2].textContent = 'Role';
+                tableHeadings[3].textContent = 'Quantity / Amount'; // Can be hidden or just show '-'
+                tableHeadings[4].textContent = 'Units'; // Can be hidden or just show '-'
+                tableHeadings[5].textContent = 'Comments';
+            } else {
+                // For inventory/substances, show original headings
+                tableHeadings[0].textContent = 'ID';
+                tableHeadings[1].textContent = 'Name';
+                tableHeadings[2].textContent = 'Type';
+                tableHeadings[3].textContent = 'Quantity / Amount';
+                tableHeadings[4].textContent = 'Units';
+                tableHeadings[5].textContent = 'Comments';
+            }
+
+
             data.forEach(item => {
-                const row = `<tr>
-                    <td>${item.id}</td>
-                    <td>${item.nosaukums}</td>
-                    <td>${item.tips}</td>
-                    <td>${item.skaits || '-'} ${item.mervienibas || ''}</td>
-                    <td>${item.komentari}</td>
-                </tr>`;
-                tbody.innerHTML += row;
+                const row = document.createElement('tr');
+                // ID
+                const idCell = document.createElement('td');
+                idCell.textContent = item.id;
+                row.appendChild(idCell);
+
+                // Name (Nosaukums)
+                const nameCell = document.createElement('td');
+                nameCell.textContent = item.nosaukums;
+                row.appendChild(nameCell);
+
+                // Type (Tips)
+                const typeCell = document.createElement('td');
+                typeCell.textContent = item.tips;
+                row.appendChild(typeCell);
+
+                // Quantity / Amount (Skaits / Daudzums)
+                const quantityCell = document.createElement('td');
+                if (item.category === 'substance') {
+                    quantityCell.textContent = `${item.skaits || '-'} ${item.daudzums || ''}`;
+                } else {
+                    quantityCell.textContent = item.skaits || '-';
+                }
+                row.appendChild(quantityCell);
+
+                // Units (Mērvienības) - new column
+                const unitsCell = document.createElement('td');
+                unitsCell.textContent = item.mervienibas || '';
+                row.appendChild(unitsCell);
+
+                // Comments (Komentāri)
+                const commentsCell = document.createElement('td');
+                commentsCell.textContent = item.komentari || '';
+                row.appendChild(commentsCell);
+
+                tbody.appendChild(row);
             });
         }
     </script>
